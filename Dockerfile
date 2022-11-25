@@ -1,9 +1,15 @@
-FROM node:16-alpine 
-WORKDIR /usr/src/app
+# nginx state for serving content
+FROM nginx:alpine
 
-COPY . .
+# Set working directory to nginx asset directory
+WORKDIR /usr/share/nginx/html
 
-RUN npm i package.json
-CMD ["npm","run","start"]
+# Remove default nginx static assets
+RUN rm -rf ./*
 
-EXPOSE 3000
+# Copy static assets from builder stage
+COPY ./build .
+
+# Containers run nginx with global directives and daemon off
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
+
